@@ -4,6 +4,9 @@ from modules.dataPreProcessor import MultiCoinPreprocessor
 from modules.sequenceGenerator import SequenceGenerator
 from modules.modelBuilding import MultiCoinLSTM
 from modules.modelTraining import MultiCoinTrainer
+from modules.prediction import MultiCoinPredictor
+from modules.modelEvaluation import MultiCoinEvaluator
+
 
 
 
@@ -16,7 +19,7 @@ from modules.modelTraining import MultiCoinTrainer
 # Example usage
 if __name__ == "__main__":
     # Step 1:
-    tickers = ["BTC-USD", "ETH-USD", "SOL-USD"]
+    tickers = ["BTC-USD", "ETH-USD"]
     start_date = "2015-10-01"
     end_date = "2025-05-31"
     interval = "1d"
@@ -27,7 +30,7 @@ if __name__ == "__main__":
     coin_files = {
         'BTC': 'BTC-USD.csv',
         'ETH': 'ETH-USD.csv',
-        'SOL': 'SOL-USD.csv',
+        # 'SOL': 'SOL-USD.csv',
     }
 
     loader = MultiCoinDataLoader()
@@ -43,8 +46,9 @@ if __name__ == "__main__":
     combined_data = loader2.load_combined_from_csv()
     
     # Step 3:
-    preprocessor = MultiCoinPreprocessor(prediction_days=60)
+    preprocessor = MultiCoinPreprocessor(prediction_days=180)
     coin_data = preprocessor.prepare_coin_data(combined_data)
+    # print(coin_data)
     coin_encodings = preprocessor.create_coin_encoding(list(coin_data.keys()))
     # Save preprocessor data (scalers and encodings)
     preprocessor.save_preprocessor("assets/preprocessor_data.pkl")
@@ -52,7 +56,7 @@ if __name__ == "__main__":
     preprocessor.load_preprocessor("assets/preprocessor_data.pkl")
 
     # Step 4: Generate sequences
-    seq_generator = SequenceGenerator(lookback=7)
+    seq_generator = SequenceGenerator(lookback=28)
     X_train, y_train, seq_info = seq_generator.generate_all_sequences(coin_data, coin_encodings)
 
     # Step 5. Model Building
@@ -77,3 +81,16 @@ if __name__ == "__main__":
     history = trainer.train(X_train, y_train, X_val, y_val, epochs=200)
     trainer.plot_training_history()
     trainer.load_best_model()
+
+
+    # Step 7. Prediction
+    predictor = MultiCoinPredictor(model, preprocessor, seq_generator)
+    predictions = predictor.predict_all_coins(coin_data, num_future_days=28)
+
+    # Step 8. Evaluation
+    evaluator = MultiCoinEvaluator()
+    metrics = evaluator.calculate_metrics(predictions)
+    evaluator.print_metrics_summary()
+    evaluator.plot_predictions(predictions)
+    
+    print(predictions, metrics)

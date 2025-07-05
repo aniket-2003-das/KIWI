@@ -46,7 +46,7 @@ class DataRequestor:
 
 # Example usage
 if __name__ == "__main__":
-    tickers = ["BTC-USD", "ETH-USD", "SOL-USD"]
+    tickers = ["BTC-USD", "ETH-USD"]
     start_date = "2015-10-01"
     end_date = "2025-05-31"
     interval = "1d"

@@ -18,7 +18,7 @@ from sklearn.preprocessing import MinMaxScaler
 class MultiCoinPreprocessor:
     """Handles preprocessing for multiple cryptocurrencies"""
     
-    def __init__(self, prediction_days: int = 60):
+    def __init__(self, prediction_days: int = 180):
         self.prediction_days = prediction_days
         self.scalers = {}
         self.coin_encoders = {}

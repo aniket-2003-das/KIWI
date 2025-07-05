@@ -12,7 +12,7 @@ warnings.filterwarnings('ignore')
 class SequenceGenerator:
     """Generates training sequences for LSTM with coin identity encoding"""
     
-    def __init__(self, lookback: int = 7):
+    def __init__(self, lookback: int = 28):
         self.lookback = lookback
         
     def generate_sequences_single_coin(self, scaled_data: np.ndarray, coin_encoding: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
